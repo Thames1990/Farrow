@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -30,7 +29,6 @@ class MapboxActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Mapbox.getInstance(this, getString(R.string.mapbox_key))
         setContentView(R.layout.activity_mapbox)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync {
@@ -84,13 +82,15 @@ class MapboxActivity : AppCompatActivity() {
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             initializeLocationEngine()
 
+            fab.setOnClickListener {
+                setCameraPosition(locationEngine.lastLocation)
+            }
+
             locationPlugin = LocationLayerPlugin(mapView, mapboxMap, locationEngine)
             locationPlugin.setLocationLayerEnabled(LocationLayerMode.TRACKING)
         } else {
             permissionsManager = PermissionsManager(object : PermissionsListener {
-                override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-
-                }
+                override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) = Unit
 
                 override fun onPermissionResult(granted: Boolean) {
                     if (granted) enableLocationPlugin()
@@ -114,26 +114,23 @@ class MapboxActivity : AppCompatActivity() {
         val lastLocation: Location? = locationEngine.lastLocation
         if (lastLocation != null) setCameraPosition(lastLocation)
         else locationEngine.addLocationEngineListener(object : LocationEngineListener {
-            override fun onLocationChanged(location: Location?) {
-                if (location != null) setCameraPosition(location)
-            }
-
+            override fun onLocationChanged(location: Location?) = setCameraPosition(location)
             override fun onConnected() = locationEngine.requestLocationUpdates()
         })
     }
 
-    private fun setCameraPosition(location: Location) {
-        val latLng = LatLng(location.latitude, location.longitude)
-        val update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0)
-        mapboxMap.animateCamera(update)
+    private fun setCameraPosition(location: Location?) {
+        if (location != null) {
+            val latLng = LatLng(location.latitude, location.longitude)
+            val update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0)
+            mapboxMap.animateCamera(update)
+        }
     }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
-    ) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
+    ) = permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
 }

@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:elevation="6dp"
         android:src="@drawable/ic_my_location_black_24dp"
         mapbox:borderWidth="0dp"
         mapbox:fabSize="normal"
