@@ -1,0 +1,3 @@
+<resources>
+    <string name="mapbox_key" templateMergeStrategy="preserve" translatable="false">pk.eyJ1IjoidGhhbWVzMTk5MCIsImEiOiJjamVpbWE1YjEwZGE2MzRudXdjZDVwNDg0In0.zXfntZrtQ9CgIdMbowTKYA</string>
+</resources>

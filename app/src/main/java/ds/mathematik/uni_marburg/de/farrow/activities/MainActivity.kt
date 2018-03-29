@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_dashboard -> Unit
-                R.id.navigation_events -> Unit
+                R.id.navigation_events -> startActivity<MapboxActivity>()
                 R.id.navigation_map -> startActivity<MapsActivity>()
             }
             true
