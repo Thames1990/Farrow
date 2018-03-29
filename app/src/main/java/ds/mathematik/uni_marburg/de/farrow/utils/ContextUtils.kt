@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.StringRes
+import android.view.View
+import android.widget.Toast
 
 @Suppress("DEPRECATION")
 inline fun <reified T : Activity> Context.startActivity(
@@ -31,3 +34,20 @@ inline fun <T> Context.startActivity(
     startActivity(intent, if (bundle.isEmpty) null else bundle)
     if (clearStack && this is Activity) finish()
 }
+
+fun View.toast(
+    @StringRes id: Int,
+    duration: Int = Toast.LENGTH_LONG
+) = context.toast(id, duration)
+
+fun Context.toast(
+    @StringRes id: Int,
+    duration: Int = Toast.LENGTH_LONG
+) = toast(this.string(id), duration)
+
+fun Context.toast(
+    text: String,
+    duration: Int = Toast.LENGTH_LONG
+) = Toast.makeText(this, text, duration).show()
+
+fun Context.string(@StringRes id: Int): String = getString(id)
