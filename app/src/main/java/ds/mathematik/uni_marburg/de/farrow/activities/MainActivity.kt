@@ -125,7 +125,11 @@ class MainActivity : AppCompatActivity() {
         val lastLocation: Location? = locationEngine.lastLocation
         if (lastLocation != null) setCameraPosition(lastLocation)
         else locationEngine.addLocationEngineListener(object : LocationEngineListener {
-            override fun onLocationChanged(location: Location?) = setCameraPosition(location)
+            override fun onLocationChanged(location: Location?) {
+                setCameraPosition(location)
+                locationEngine.removeLocationEngineListener(this)
+            }
+
             override fun onConnected() = locationEngine.requestLocationUpdates()
         })
     }
