@@ -95,7 +95,8 @@ class MainActivity : AppCompatActivity() {
             initializeLocationEngine()
 
             fab.setOnClickListener {
-                setCameraPosition(locationEngine.lastLocation)
+                val lastLocation: Location? = locationEngine.lastLocation
+                if (lastLocation != null) setCameraPosition(lastLocation)
             }
 
             if (!::locationPlugin.isInitialized) locationPlugin = LocationLayerPlugin(
@@ -127,17 +128,21 @@ class MainActivity : AppCompatActivity() {
         val lastLocation: Location? = locationEngine.lastLocation
         if (lastLocation != null) setCameraPosition(lastLocation)
         else locationEngine.addLocationEngineListener(object : LocationEngineListener {
-            override fun onLocationChanged(location: Location?) = setCameraPosition(location)
+            override fun onLocationChanged(location: Location?) {
+                if (location != null) {
+                    setCameraPosition(location)
+                    locationEngine.removeLocationEngineListener(this)
+                }
+            }
+
             override fun onConnected() = locationEngine.requestLocationUpdates()
         })
     }
 
-    private fun setCameraPosition(location: Location?) {
-        if (location != null) {
-            val latLng = LatLng(location.latitude, location.longitude)
-            val update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0)
-            mapboxMap.animateCamera(update)
-        }
+    private fun setCameraPosition(location: Location) {
+        val latLng = LatLng(location.latitude, location.longitude)
+        val update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0)
+        mapboxMap.animateCamera(update)
     }
 
     companion object {
