@@ -1,10 +1,10 @@
 package ds.mathematik.uni_marburg.de.farrow
 
 import android.app.Application
+import ca.allanwang.kau.utils.string
 import com.mapbox.mapboxsdk.Mapbox
-import ds.mathematik.uni_marburg.de.farrow.utils.string
 
-class Farrow: Application() {
+class Farrow : Application() {
 
     override fun onCreate() {
         super.onCreate()
