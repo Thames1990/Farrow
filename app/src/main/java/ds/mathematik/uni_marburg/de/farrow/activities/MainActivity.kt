@@ -36,15 +36,19 @@ class MainActivity : AppCompatActivity() {
 
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_dashboard -> Unit
-                R.id.navigation_events -> Unit
-                R.id.navigation_map -> initializeMapbox()
+                R.id.navigation_dashboard -> selectDashboard()
+                R.id.navigation_events -> selectEvents()
+                R.id.navigation_map -> selectMap()
             }
             true
         }
     }
 
-    private fun initializeMapbox() {
+    private fun selectDashboard() = fab.hide()
+
+    private fun selectEvents() = fab.hide()
+
+    private fun selectMap() {
         val fragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) as SupportMapFragment?
 
         if (fragment == null) {
@@ -58,6 +62,8 @@ class MainActivity : AppCompatActivity() {
                 enableLocationPlugin()
             }
         } else mapFragment = fragment
+
+        fab.show()
     }
 
     @SuppressLint("MissingPermission")
@@ -88,9 +94,9 @@ class MainActivity : AppCompatActivity() {
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             initializeLocationEngine()
 
-//            fab.setOnClickListener {
-//                setCameraPosition(locationEngine.lastLocation)
-//            }
+            fab.setOnClickListener {
+                setCameraPosition(locationEngine.lastLocation)
+            }
 
             if (!::locationPlugin.isInitialized) locationPlugin = LocationLayerPlugin(
                 mapFragment.view as MapView,
