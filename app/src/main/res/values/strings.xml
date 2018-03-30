@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <string name="action_1">Action 1</string>
+    <string name="action_2">Action 2</string>
+
     <string name="app_name">Farrow</string>
 
-    <string name="title_activity_maps">Map</string>
+    <string name="subhead">Subhead</string>
+
+    <string name="title">Title</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_events">Events</string>
     <string name="title_map">Map</string>
+
     <string name="user_location_permission_not_granted">Location permission not granted</string>
 </resources>

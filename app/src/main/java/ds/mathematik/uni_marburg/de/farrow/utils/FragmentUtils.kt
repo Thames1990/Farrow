@@ -2,7 +2,7 @@ package ds.mathematik.uni_marburg.de.farrow.utils
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
-import android.support.v4.app.FragmentActivity
+import android.support.v4.app.Fragment
 
 /**
  * Creates a {@link ViewModelProvider}, which retains ViewModels while a scope of given Activity
@@ -12,5 +12,5 @@ import android.support.v4.app.FragmentActivity
  *
  * @return a ViewModelProvider instance
  */
-inline fun <reified T : ViewModel> FragmentActivity.getViewModel(): T =
-    ViewModelProviders.of(this)[T::class.java]
+inline fun <reified T : ViewModel> Fragment.getViewModel(): T =
+    ViewModelProviders.of(requireActivity())[T::class.java]

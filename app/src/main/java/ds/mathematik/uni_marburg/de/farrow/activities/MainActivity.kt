@@ -5,7 +5,7 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
-import ca.allanwang.kau.utils.toast
+import android.widget.Toast
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -20,10 +20,15 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import ds.mathematik.uni_marburg.de.farrow.R
+import ds.mathematik.uni_marburg.de.farrow.fragments.EventsFragment
+import ds.mathematik.uni_marburg.de.farrow.model.event.EventViewModel
+import ds.mathematik.uni_marburg.de.farrow.utils.getViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var eventsFragment: EventsFragment
+    private lateinit var eventViewModel: EventViewModel
     private lateinit var locationEngine: LocationEngine
     private lateinit var locationPlugin: LocationLayerPlugin
     private lateinit var mapboxMap: MapboxMap
@@ -33,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        eventViewModel = getViewModel()
 
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -46,15 +53,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun selectDashboard() = fab.hide()
 
-    private fun selectEvents() = fab.hide()
+    private fun selectEvents() {
+        val fragment =
+            supportFragmentManager.findFragmentByTag(EVENTS_FRAGMENT_TAG) as EventsFragment?
+
+        if (fragment == null) {
+            val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+            eventsFragment = EventsFragment()
+            transaction.replace(R.id.container, eventsFragment, EVENTS_FRAGMENT_TAG)
+            transaction.commit()
+        } else eventsFragment = fragment
+
+        fab.hide()
+    }
 
     private fun selectMap() {
-        val fragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG) as SupportMapFragment?
+        val fragment =
+            supportFragmentManager.findFragmentByTag(MAP_FRAGMENT_TAG) as SupportMapFragment?
 
         if (fragment == null) {
             val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
             mapFragment = SupportMapFragment.newInstance()
-            transaction.replace(R.id.container, mapFragment, FRAGMENT_TAG)
+            transaction.replace(R.id.container, mapFragment, MAP_FRAGMENT_TAG)
             transaction.commit()
 
             mapFragment.getMapAsync {
@@ -110,7 +130,11 @@ class MainActivity : AppCompatActivity() {
                 override fun onPermissionResult(granted: Boolean) =
                     if (granted) enableLocationPlugin()
                     else {
-                        baseContext.toast(R.string.user_location_permission_not_granted)
+                        Toast.makeText(
+                            baseContext,
+                            R.string.user_location_permission_not_granted,
+                            Toast.LENGTH_SHORT
+                        ).show()
                         finish()
                     }
             })
@@ -146,7 +170,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val FRAGMENT_TAG = "FRAGMENT_TAG"
+        const val EVENTS_FRAGMENT_TAG = "EVENTS_FRAGMENT_TAG"
+        const val MAP_FRAGMENT_TAG = "MAP_FRAGMENT_TAG"
     }
 
 }

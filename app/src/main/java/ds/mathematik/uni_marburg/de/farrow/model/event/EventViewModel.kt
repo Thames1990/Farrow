@@ -6,9 +6,9 @@ import android.arch.lifecycle.LiveData
 
 class EventViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val dao: EventDao = EventDatabase.get(application).dao()
+    private val dao = EventDatabase.get(application).dao()
 
-    val liveData: LiveData<List<Event>>
+    val events: LiveData<List<Event>>
         get() = dao.getEvents()
 
 }

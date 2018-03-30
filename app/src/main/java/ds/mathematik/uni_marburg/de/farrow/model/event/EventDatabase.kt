@@ -30,15 +30,17 @@ abstract class EventDatabase : RoomDatabase() {
                     val eventDatabase: EventDatabase = get(context)
                     val dao: EventDao = eventDatabase.dao()
 
-                    (0 until 10000L).map {
-                        val position: LatLng = generatePosition()
-                        val event = Event(
-                            id = it,
-                            latitude = position.latitude,
-                            longitude = position.longitude
-                        )
-                        dao.insert(event)
-                    }
+                    repeat(
+                        times = 10000,
+                        action = {
+                            val position: LatLng = generatePosition()
+                            val event = Event(
+                                latitude = position.latitude,
+                                longitude = position.longitude
+                            )
+                            dao.insert(event)
+                        }
+                    )
                 }
             ).also { database = it }
     }
