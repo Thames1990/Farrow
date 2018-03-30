@@ -5,24 +5,22 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineListener
+import com.mapbox.android.core.location.LocationEnginePriority
+import com.mapbox.android.core.location.LocationEngineProvider
+import com.mapbox.android.core.permissions.PermissionsListener
+import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.SupportMapFragment
-import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerMode
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
-import com.mapbox.services.android.telemetry.location.LocationEngine
-import com.mapbox.services.android.telemetry.location.LocationEngineListener
-import com.mapbox.services.android.telemetry.location.LocationEnginePriority
-import com.mapbox.services.android.telemetry.location.LocationEngineProvider
-import com.mapbox.services.android.telemetry.permissions.PermissionsListener
-import com.mapbox.services.android.telemetry.permissions.PermissionsManager
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.utils.toast
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_mapbox.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,12 +52,12 @@ class MainActivity : AppCompatActivity() {
             mapFragment = SupportMapFragment.newInstance()
             transaction.replace(R.id.container, mapFragment, FRAGMENT_TAG)
             transaction.commit()
-        } else mapFragment = fragment
 
-        mapFragment.getMapAsync {
-            mapboxMap = it
-            enableLocationPlugin()
-        }
+            mapFragment.getMapAsync {
+                mapboxMap = it
+                enableLocationPlugin()
+            }
+        } else mapFragment = fragment
     }
 
     @SuppressLint("MissingPermission")
@@ -72,13 +70,11 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         if (::locationEngine.isInitialized) locationEngine.removeLocationUpdates()
         if (::locationPlugin.isInitialized) locationPlugin.onStop()
-        mapView.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         if (::locationEngine.isInitialized) locationEngine.deactivate()
-        mapView.onDestroy()
     }
 
     override fun onRequestPermissionsResult(
@@ -96,11 +92,11 @@ class MainActivity : AppCompatActivity() {
 //                setCameraPosition(locationEngine.lastLocation)
 //            }
 
-            locationPlugin = LocationLayerPlugin(
+            if (!::locationPlugin.isInitialized) locationPlugin = LocationLayerPlugin(
                 mapFragment.view as MapView,
                 mapboxMap,
                 locationEngine
-            ).apply { setLocationLayerEnabled(LocationLayerMode.TRACKING) }
+            ).apply { setLocationLayerEnabled(true) }
         } else {
             permissionsManager = PermissionsManager(object : PermissionsListener {
                 override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) = Unit
@@ -125,11 +121,7 @@ class MainActivity : AppCompatActivity() {
         val lastLocation: Location? = locationEngine.lastLocation
         if (lastLocation != null) setCameraPosition(lastLocation)
         else locationEngine.addLocationEngineListener(object : LocationEngineListener {
-            override fun onLocationChanged(location: Location?) {
-                setCameraPosition(location)
-                locationEngine.removeLocationEngineListener(this)
-            }
-
+            override fun onLocationChanged(location: Location?) = setCameraPosition(location)
             override fun onConnected() = locationEngine.requestLocationUpdates()
         })
     }
