@@ -38,16 +38,16 @@ inline fun <T> Context.startActivity(
 fun View.toast(
     @StringRes id: Int,
     duration: Int = Toast.LENGTH_LONG
-) = context.toast(id, duration)
+): Toast = context.toast(id, duration)
 
 fun Context.toast(
     @StringRes id: Int,
     duration: Int = Toast.LENGTH_LONG
-) = toast(this.string(id), duration)
+): Toast = toast(this.string(id), duration)
 
 fun Context.toast(
     text: String,
     duration: Int = Toast.LENGTH_LONG
-) = Toast.makeText(this, text, duration).show()
+): Toast = Toast.makeText(this, text, duration).apply { show() }
 
 fun Context.string(@StringRes id: Int): String = getString(id)
