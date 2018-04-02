@@ -15,7 +15,7 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "MAPBOX_KEY", "\"pk.eyJ1IjoidGhhbWVzMTk5MCIsImEiOiJjamVpbWE1YjEwZGE2MzRudXdjZDVwNDg0In0.zXfntZrtQ9CgIdMbowTKYA\""
+            buildConfigField "String", "MAPBOX_KEY", MAPBOX_KEY
         }
         release {
             minifyEnabled false
