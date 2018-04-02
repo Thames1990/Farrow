@@ -15,34 +15,41 @@ abstract class EventDatabase : RoomDatabase() {
     companion object {
         private var database: EventDatabase? = null
 
-        private val random = Random()
+        private fun generatePosition(): LatLng {
+            val random = Random()
 
-        private fun generatePosition() = LatLng(
-            (random.nextDouble() * -180.0) + 90.0,
-            (random.nextDouble() * -360.0) + 180.0
-        )
+            fun randomLatitude(from: Int = -90, to: Int = 90): Double {
+                return from + (to - from) * random.nextDouble()
+            }
+
+            fun randomLongitude(from: Int = -180, to: Int = 180): Double {
+                return from + (to - from) * random.nextDouble()
+            }
+
+            return LatLng(randomLatitude(), randomLongitude())
+        }
 
         @Synchronized
         fun get(context: Context): EventDatabase =
-            database ?: context.applicationContext.roomDb<EventDatabase>(
-                name = "events.db",
-                onFirstCreate = {
-                    val eventDatabase: EventDatabase = get(context)
-                    val dao: EventDao = eventDatabase.dao()
+                database ?: context.applicationContext.roomDb<EventDatabase>(
+                        name = "events.db",
+                        onFirstCreate = {
+                            val eventDatabase: EventDatabase = get(context)
+                            val dao: EventDao = eventDatabase.dao()
 
-                    repeat(
-                        times = 10000,
-                        action = {
-                            val position: LatLng = generatePosition()
-                            val event = Event(
-                                latitude = position.latitude,
-                                longitude = position.longitude
+                            repeat(
+                                    times = 10000,
+                                    action = {
+                                        val position: LatLng = generatePosition()
+                                        val event = Event(
+                                                latitude = position.latitude,
+                                                longitude = position.longitude
+                                        )
+                                        dao.insert(event)
+                                    }
                             )
-                            dao.insert(event)
                         }
-                    )
-                }
-            ).also { database = it }
+                ).also { database = it }
     }
 
 }
