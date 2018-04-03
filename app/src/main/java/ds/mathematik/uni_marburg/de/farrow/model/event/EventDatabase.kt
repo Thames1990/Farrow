@@ -18,7 +18,7 @@ abstract class EventDatabase : RoomDatabase() {
         private fun generatePosition(): LatLng {
             val random = Random()
 
-            fun randomLatitude(from: Int = -90, to: Int = 90): Double {
+            fun randomLatitude(from: Int = -85, to: Int = 85): Double {
                 return from + (to - from) * random.nextDouble()
             }
 
