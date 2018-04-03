@@ -3,6 +3,7 @@ package ds.mathematik.uni_marburg.de.farrow.model.event
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
+import com.mapbox.mapboxsdk.constants.GeometryConstants
 import com.mapbox.mapboxsdk.geometry.LatLng
 import ds.mathematik.uni_marburg.de.farrow.utils.roomDb
 import java.util.*
@@ -18,13 +19,15 @@ abstract class EventDatabase : RoomDatabase() {
         private fun generatePosition(): LatLng {
             val random = Random()
 
-            fun randomLatitude(from: Int = -85, to: Int = 85): Double {
-                return from + (to - from) * random.nextDouble()
-            }
+            fun randomLatitude(
+                minLatitude: Double = GeometryConstants.MIN_LATITUDE,
+                maxLatitude: Double = GeometryConstants.MAX_LATITUDE
+            ): Double = minLatitude + (maxLatitude - minLatitude) * random.nextDouble()
 
-            fun randomLongitude(from: Int = -180, to: Int = 180): Double {
-                return from + (to - from) * random.nextDouble()
-            }
+            fun randomLongitude(
+                minLongitude: Double = GeometryConstants.MIN_LONGITUDE,
+                maxLongitude: Double = GeometryConstants.MAX_LONGITUDE
+            ): Double = minLongitude + (maxLongitude - minLongitude) * random.nextDouble()
 
             return LatLng(randomLatitude(), randomLongitude())
         }
