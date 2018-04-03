@@ -1,13 +1,10 @@
 package ds.mathematik.uni_marburg.de.farrow.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.location.Location
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -43,7 +40,7 @@ class MapFragment : BaseFragment() {
         mapView.getMapAsync {
             mapboxMap = it
 
-            enableLocationPlugin(requireContext())
+            enableLocationPlugin()
             enableClusterPlugin()
 
             observe(
@@ -58,21 +55,9 @@ class MapFragment : BaseFragment() {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onStart() {
-        super.onStart()
-        if (::locationPlugin.isInitialized) locationPlugin.onStart()
-    }
-
     override fun onStop() {
         super.onStop()
-        if (::locationEngine.isInitialized) locationEngine.removeLocationUpdates()
-        if (::locationPlugin.isInitialized) locationPlugin.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (::locationEngine.isInitialized) locationEngine.deactivate()
+        locationEngine.removeLocationUpdates()
     }
 
     override fun onRequestPermissionsResult(
@@ -82,31 +67,29 @@ class MapFragment : BaseFragment() {
     ) = permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
     @SuppressLint("MissingPermission")
-    private fun enableLocationPlugin(context: Context) {
+    private fun enableLocationPlugin() {
         if (PermissionsManager.areLocationPermissionsGranted(context)) {
-            initializeLocationEngine(context)
+            initializeLocationEngine()
 
-            if (!::locationPlugin.isInitialized) locationPlugin = LocationLayerPlugin(
-                mapView,
-                mapboxMap,
-                locationEngine
-            ).apply { setLocationLayerEnabled(true) }
+            locationPlugin = LocationLayerPlugin(mapView, mapboxMap, locationEngine)
+            locationPlugin.setLocationLayerEnabled(true)
         } else {
             permissionsManager = PermissionsManager(object : PermissionsListener {
                 override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) = Unit
-                override fun onPermissionResult(granted: Boolean) =
-                    if (granted) enableLocationPlugin(context)
-                    else {
-                        Toast.makeText(
-                            context,
-                            R.string.user_location_permission_not_granted,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        requireActivity().finish()
-                    }
+                override fun onPermissionResult(granted: Boolean) {
+                    if (granted) enableLocationPlugin()
+                }
             })
             permissionsManager.requestLocationPermissions(requireActivity())
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initializeLocationEngine() {
+        locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
+        locationEngine.priority = LocationEnginePriority.HIGH_ACCURACY
+        locationEngine.activate()
+        locationEngine.lastLocation?.let { setCameraPosition(it) }
     }
 
     private fun enableClusterPlugin() {
@@ -126,27 +109,6 @@ class MapFragment : BaseFragment() {
         }
 
         mapboxMap.addOnCameraIdleListener(clusterManagerPlugin)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun initializeLocationEngine(context: Context) {
-        locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable().apply {
-            priority = LocationEnginePriority.HIGH_ACCURACY
-            activate()
-        }
-
-        val lastLocation: Location? = locationEngine.lastLocation
-        if (lastLocation != null) setCameraPosition(lastLocation)
-        else locationEngine.addLocationEngineListener(object : LocationEngineListener {
-            override fun onLocationChanged(location: Location?) {
-                if (location != null) {
-                    setCameraPosition(location)
-                    locationEngine.removeLocationEngineListener(this)
-                }
-            }
-
-            override fun onConnected() = locationEngine.requestLocationUpdates()
-        })
     }
 
     private fun setCameraPosition(location: Location) {
