@@ -9,7 +9,6 @@ import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -93,27 +92,33 @@ class MapFragment : BaseFragment() {
     }
 
     private fun enableClusterPlugin() {
-        clusterManagerPlugin = ClusterManagerPlugin(requireContext(), mapboxMap)
-        clusterManagerPlugin.setOnClusterClickListener {
-            val markers: MutableCollection<Marker>? = clusterManagerPlugin.markerCollection.markers
+        clusterManagerPlugin = ClusterManagerPlugin(context, mapboxMap)
+        clusterManagerPlugin.setOnClusterClickListener { cluster ->
+            val events: MutableCollection<Event>? = cluster.items
 
-            if (markers != null) {
+            if (events != null && events.isNotEmpty()) {
                 val builder = LatLngBounds.Builder()
-                markers.forEach { builder.include(it.position) }
+                events.forEach { builder.include(it.position) }
                 val bounds: LatLngBounds = builder.build()
-                val update: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 16)
-                mapboxMap.animateCamera(update)
+                moveToBounds(bounds)
+
                 return@setOnClusterClickListener true
             }
             return@setOnClusterClickListener false
         }
 
         mapboxMap.addOnCameraIdleListener(clusterManagerPlugin)
+        mapboxMap.setOnMarkerClickListener(clusterManagerPlugin)
     }
 
     private fun setCameraPosition(location: Location) {
         val latLng = LatLng(location.latitude, location.longitude)
         val update: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16.0)
+        mapboxMap.animateCamera(update)
+    }
+
+    private fun moveToBounds(bounds: LatLngBounds) {
+        val update: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 16)
         mapboxMap.animateCamera(update)
     }
 
