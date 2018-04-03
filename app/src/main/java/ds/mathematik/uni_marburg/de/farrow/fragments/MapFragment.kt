@@ -12,13 +12,16 @@ import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import ds.mathematik.uni_marburg.de.farrow.R
+import ds.mathematik.uni_marburg.de.farrow.model.event.Event
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
 import kotlinx.android.synthetic.main.fragment_map.*
 
@@ -27,6 +30,7 @@ class MapFragment : BaseFragment() {
     override val layout: Int
         get() = R.layout.fragment_map
 
+    private lateinit var clusterManagerPlugin: ClusterManagerPlugin<Event>
     private lateinit var locationEngine: LocationEngine
     private lateinit var locationPlugin: LocationLayerPlugin
     private lateinit var mapboxMap: MapboxMap
@@ -39,19 +43,13 @@ class MapFragment : BaseFragment() {
         mapView.getMapAsync {
             mapboxMap = it
 
-            observe(eventViewModel.events, { events ->
-                mapboxMap.clear()
-                events?.forEach { event ->
-                    val marker = MarkerOptions()
-                        .position(event.position)
-                        .title(event.id.toString())
-                        .snippet("${event.latitude}\n${event.longitude}")
-                    mapboxMap.addMarker(marker)
-                }
-
-            })
-
             enableLocationPlugin(requireContext())
+            enableClusterPlugin()
+
+            observe(
+                liveData = eventViewModel.events,
+                onChanged = { events -> clusterManagerPlugin.addItems(events) }
+            )
 
             fab.setOnClickListener {
                 val lastLocation: Location? = locationEngine.lastLocation
@@ -109,6 +107,25 @@ class MapFragment : BaseFragment() {
             })
             permissionsManager.requestLocationPermissions(requireActivity())
         }
+    }
+
+    private fun enableClusterPlugin() {
+        clusterManagerPlugin = ClusterManagerPlugin(requireContext(), mapboxMap)
+        clusterManagerPlugin.setOnClusterClickListener {
+            val markers: MutableCollection<Marker>? = clusterManagerPlugin.markerCollection.markers
+
+            if (markers != null) {
+                val builder = LatLngBounds.Builder()
+                markers.forEach { builder.include(it.position) }
+                val bounds: LatLngBounds = builder.build()
+                val update: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 16)
+                mapboxMap.animateCamera(update)
+                return@setOnClusterClickListener true
+            }
+            return@setOnClusterClickListener false
+        }
+
+        mapboxMap.addOnCameraIdleListener(clusterManagerPlugin)
     }
 
     @SuppressLint("MissingPermission")
