@@ -45,6 +45,7 @@ class MapFragment : BaseFragment() {
                     val marker = MarkerOptions()
                         .position(event.position)
                         .title(event.id.toString())
+                        .snippet("${event.latitude}\n${event.longitude}")
                     mapboxMap.addMarker(marker)
                 }
 
