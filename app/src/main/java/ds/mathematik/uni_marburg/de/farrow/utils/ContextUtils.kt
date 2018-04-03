@@ -10,7 +10,7 @@ fun ioThread(f: () -> Unit) = Executors.newSingleThreadExecutor().execute(f)
 
 inline fun <reified T : RoomDatabase> Context.roomDbBuilder(
     name: String
-) = Room.databaseBuilder(this, T::class.java, name)
+) = Room.databaseBuilder(this.applicationContext, T::class.java, name)
 
 inline fun <reified T : RoomDatabase> Context.roomDb(
     name: String,

@@ -30,26 +30,25 @@ abstract class EventDatabase : RoomDatabase() {
         }
 
         @Synchronized
-        fun get(context: Context): EventDatabase =
-                database ?: context.applicationContext.roomDb<EventDatabase>(
-                        name = "events.db",
-                        onFirstCreate = {
-                            val eventDatabase: EventDatabase = get(context)
-                            val dao: EventDao = eventDatabase.dao()
+        fun get(context: Context): EventDatabase = database ?: context.roomDb<EventDatabase>(
+            name = "events.db",
+            onFirstCreate = {
+                val eventDatabase: EventDatabase = get(context)
+                val dao: EventDao = eventDatabase.dao()
 
-                            repeat(
-                                    times = 10000,
-                                    action = {
-                                        val position: LatLng = generatePosition()
-                                        val event = Event(
-                                                latitude = position.latitude,
-                                                longitude = position.longitude
-                                        )
-                                        dao.insert(event)
-                                    }
-                            )
-                        }
-                ).also { database = it }
+                repeat(
+                    times = 10000,
+                    action = {
+                        val position: LatLng = generatePosition()
+                        val event = Event(
+                            latitude = position.latitude,
+                            longitude = position.longitude
+                        )
+                        dao.insert(event)
+                    }
+                )
+            }
+        ).also { database = it }
     }
 
 }
