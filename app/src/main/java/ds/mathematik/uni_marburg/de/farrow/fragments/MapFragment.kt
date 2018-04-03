@@ -12,12 +12,14 @@ import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import ds.mathematik.uni_marburg.de.farrow.R
+import ds.mathematik.uni_marburg.de.farrow.utils.observe
 import kotlinx.android.synthetic.main.fragment_map.*
 
 class MapFragment : BaseFragment() {
@@ -36,7 +38,20 @@ class MapFragment : BaseFragment() {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync {
             mapboxMap = it
+
+            observe(eventViewModel.events, { events ->
+                mapboxMap.clear()
+                events?.forEach { event ->
+                    val marker = MarkerOptions()
+                        .position(event.position)
+                        .title(event.id.toString())
+                    mapboxMap.addMarker(marker)
+                }
+
+            })
+
             enableLocationPlugin(requireContext())
+
             fab.setOnClickListener {
                 val lastLocation: Location? = locationEngine.lastLocation
                 if (lastLocation != null) setCameraPosition(lastLocation)
