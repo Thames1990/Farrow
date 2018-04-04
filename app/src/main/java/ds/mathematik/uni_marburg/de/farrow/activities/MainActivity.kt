@@ -1,11 +1,13 @@
 package ds.mathematik.uni_marburg.de.farrow.activities
 
 import android.os.Bundle
-import android.support.v4.app.FragmentTransaction
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import ca.allanwang.kau.utils.toDrawable
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import ds.mathematik.uni_marburg.de.farrow.R
+import ds.mathematik.uni_marburg.de.farrow.fragments.DashboardFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.EventsFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.MapFragment
 import ds.mathematik.uni_marburg.de.farrow.model.event.EventViewModel
@@ -15,72 +17,46 @@ import org.jetbrains.anko.itemsSequence
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var eventsFragment: EventsFragment
     private lateinit var eventViewModel: EventViewModel
-    private lateinit var mapFragment: MapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         eventViewModel = getViewModel()
-
         setupNavigation()
     }
 
-    private fun setupNavigation() = with(navigation) {
+    private fun setupNavigation() = with(bottom_navigation) {
         menu.itemsSequence().forEach { item ->
             item.icon = when (item.itemId) {
-                R.id.navigation_dashboard -> GoogleMaterial.Icon.gmd_dashboard.toDrawable(context)
-                R.id.navigation_events -> GoogleMaterial.Icon.gmd_view_list.toDrawable(context)
-                R.id.navigation_map -> GoogleMaterial.Icon.gmd_map.toDrawable(context)
+                R.id.action_dashboard -> GoogleMaterial.Icon.gmd_dashboard.toDrawable(context)
+                R.id.action_events -> GoogleMaterial.Icon.gmd_view_list.toDrawable(context)
+                R.id.action_map -> GoogleMaterial.Icon.gmd_map.toDrawable(context)
                 else -> TODO()
             }
         }
 
+        viewpager.adapter = BottomNavigationAdapter()
+
         setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_dashboard -> selectDashboard()
-                R.id.navigation_events -> selectEvents()
-                R.id.navigation_map -> selectMap()
+                R.id.action_dashboard -> viewpager.currentItem = 0
+                R.id.action_events -> viewpager.currentItem = 1
+                R.id.action_map -> viewpager.currentItem = 2
             }
             true
         }
     }
 
-    private fun selectDashboard() = Unit
+    private inner class BottomNavigationAdapter : FragmentPagerAdapter(supportFragmentManager) {
 
-    private fun selectEvents() {
-        val tag = EVENTS_FRAGMENT_TAG
-        val fragment = supportFragmentManager.findFragmentByTag(tag) as EventsFragment?
+        private val fragments: List<Fragment> =
+            listOf(DashboardFragment(), EventsFragment(), MapFragment())
 
-        if (fragment == null) {
-            val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-            eventsFragment = EventsFragment()
-            transaction.replace(R.id.container, eventsFragment, EVENTS_FRAGMENT_TAG)
-            transaction.commit()
-        } else {
-            eventsFragment = fragment
-        }
-    }
+        override fun getItem(position: Int): Fragment = fragments[position]
 
-    private fun selectMap() {
-        val tag = MAP_FRAGMENT_TAG
-        val fragment = supportFragmentManager.findFragmentByTag(tag) as MapFragment?
+        override fun getCount(): Int = fragments.count()
 
-        if (fragment == null) {
-            val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-            mapFragment = MapFragment()
-            transaction.replace(R.id.container, mapFragment, MAP_FRAGMENT_TAG)
-            transaction.commit()
-        } else {
-            mapFragment = fragment
-        }
-    }
-
-    companion object {
-        const val EVENTS_FRAGMENT_TAG = "EVENTS_FRAGMENT_TAG"
-        const val MAP_FRAGMENT_TAG = "MAP_FRAGMENT_TAG"
     }
 
 }
