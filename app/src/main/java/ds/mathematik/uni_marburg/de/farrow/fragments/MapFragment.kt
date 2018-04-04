@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import ca.allanwang.kau.utils.setIcon
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -26,6 +25,7 @@ import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.model.event.Event
 import ds.mathematik.uni_marburg.de.farrow.utils.createOptionsMenu
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
+import ds.mathematik.uni_marburg.de.farrow.utils.showWithOptions
 import kotlinx.android.synthetic.main.fragment_map.*
 
 class MapFragment : BaseFragment() {
@@ -65,11 +65,11 @@ class MapFragment : BaseFragment() {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun setupFab() = with(fab) {
-        setIcon(GoogleMaterial.Icon.gmd_my_location)
-        setOnClickListener { locationEngine.lastLocation?.let { setCameraPosition(it) } }
-    }
+    private fun setupFab() = fab.showWithOptions(
+        icon = GoogleMaterial.Icon.gmd_my_location,
+        tooltipTextRes = R.string.fab_tooltip_my_location,
+        onClickListener = { locationPlugin.lastKnownLocation?.let { setCameraPosition(it) } }
+    )
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) = createOptionsMenu(
         inflater = inflater,

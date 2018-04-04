@@ -14,11 +14,13 @@ import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geocoder.android.AndroidGeocoder
 import com.mapbox.geojson.Point
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.squareup.picasso.Picasso
 import ds.mathematik.uni_marburg.de.farrow.BuildConfig
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.model.event.Event
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
+import ds.mathematik.uni_marburg.de.farrow.utils.showWithOptions
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.event_row.*
 import kotlinx.android.synthetic.main.fragment_events.*
@@ -34,9 +36,18 @@ class EventsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         recyclerView.withLinearAdapter(eventAdapter)
+        setupFab()
+
         observe(eventViewModel.events, eventAdapter::submitList)
     }
+
+    private fun setupFab() = fab.showWithOptions(
+        icon = GoogleMaterial.Icon.gmd_arrow_upward,
+        tooltipTextRes = R.string.fab_tooltip_scroll_to_top,
+        onClickListener = { recyclerView.scrollToPosition(0) }
+    )
 
     private class EventAdapter : ListAdapter<Event, EventAdapter.ViewHolder>(diffCallback) {
 

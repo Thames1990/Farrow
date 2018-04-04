@@ -6,6 +6,9 @@
 
     <string name="app_name">Farrow</string>
 
+    <string name="fab_tooltip_my_location">My location</string>
+    <string name="fab_tooltip_scroll_to_top">Scroll to top</string>
+
     <string name="menu_map_style">Map Style</string>
     <string name="menu_map_style_dark">Dark</string>
     <string name="menu_map_style_light">Light</string>
