@@ -60,6 +60,7 @@ class MapFragment : BaseFragment() {
                 onChanged = { events ->
                     clusterManagerPlugin.clearItems()
                     clusterManagerPlugin.addItems(events)
+                    zoomToAllMarkers(events)
                 }
             )
         }
@@ -130,20 +131,22 @@ class MapFragment : BaseFragment() {
         clusterManagerPlugin = ClusterManagerPlugin(context, mapboxMap)
         clusterManagerPlugin.setOnClusterClickListener { cluster ->
             val events: MutableCollection<Event>? = cluster.items
-
-            if (events != null && events.isNotEmpty()) {
-                val builder = LatLngBounds.Builder()
-                events.forEach { builder.include(it.position) }
-                val bounds: LatLngBounds = builder.build()
-                moveToBounds(bounds)
-
-                return@setOnClusterClickListener true
-            }
-            return@setOnClusterClickListener false
+            zoomToAllMarkers(events?.toList())
         }
 
         mapboxMap.addOnCameraIdleListener(clusterManagerPlugin)
         mapboxMap.setOnMarkerClickListener(clusterManagerPlugin)
+    }
+
+    private fun zoomToAllMarkers(events: List<Event>?): Boolean {
+        if (events != null && events.isNotEmpty()) {
+            val builder = LatLngBounds.Builder()
+            events.forEach { event -> builder.include(event.position) }
+            val bounds: LatLngBounds = builder.build()
+            moveToBounds(bounds)
+            return true
+        }
+        return false
     }
 
     private fun setCameraPosition(location: Location) {
