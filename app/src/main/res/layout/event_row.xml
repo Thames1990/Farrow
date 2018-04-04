@@ -23,7 +23,6 @@
             android:padding="4dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_my_location_black_24dp"
-            app:layout_constraintBottom_toTopOf="@+id/media_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
@@ -52,7 +51,6 @@
             android:layout_marginTop="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/colorSecondaryTextDefaultMaterialLight"
-            app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/avatar_image"
             app:layout_constraintTop_toBottomOf="@+id/title_text"
@@ -64,12 +62,12 @@
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
             android:scaleType="centerCrop"
-            tools:src="@android:color/darker_gray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="H,16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/avatar_image" />
+            app:layout_constraintTop_toBottomOf="@+id/subtitle_text"
+            tools:src="@android:color/darker_gray" />
 
 
     </android.support.constraint.ConstraintLayout>
