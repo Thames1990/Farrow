@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import ca.allanwang.kau.utils.setIcon
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -43,7 +44,6 @@ class MapFragment : BaseFragment() {
         setHasOptionsMenu(true)
     }
 
-    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView.onCreate(savedInstanceState)
@@ -53,6 +53,8 @@ class MapFragment : BaseFragment() {
             enableLocationPlugin()
             enableClusterPlugin()
 
+            setupFab()
+
             observe(
                 liveData = eventViewModel.events,
                 onChanged = { events ->
@@ -60,17 +62,13 @@ class MapFragment : BaseFragment() {
                     clusterManagerPlugin.addItems(events)
                 }
             )
-
-            fab.setOnClickListener {
-                val lastLocation: Location? = locationEngine.lastLocation
-                if (lastLocation != null) setCameraPosition(lastLocation)
-            }
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        locationEngine.removeLocationUpdates()
+    @SuppressLint("MissingPermission")
+    private fun setupFab() = with(fab) {
+        setIcon(GoogleMaterial.Icon.gmd_my_location)
+        setOnClickListener { locationEngine.lastLocation?.let { setCameraPosition(it) } }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) = createOptionsMenu(
