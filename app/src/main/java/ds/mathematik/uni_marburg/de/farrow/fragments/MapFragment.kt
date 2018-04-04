@@ -3,6 +3,10 @@ package ds.mathematik.uni_marburg.de.farrow.fragments
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -11,6 +15,7 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -18,6 +23,7 @@ import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.model.event.Event
+import ds.mathematik.uni_marburg.de.farrow.utils.createOptionsMenu
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
 import kotlinx.android.synthetic.main.fragment_map.*
 
@@ -32,12 +38,19 @@ class MapFragment : BaseFragment() {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var permissionsManager: PermissionsManager
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync {
             mapboxMap = it
+
+            mapboxMap.setStyleUrl(Style.DARK)
 
             enableLocationPlugin()
             enableClusterPlugin()
@@ -57,6 +70,34 @@ class MapFragment : BaseFragment() {
     override fun onStop() {
         super.onStop()
         locationEngine.removeLocationUpdates()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) = createOptionsMenu(
+        inflater = inflater,
+        menuRes = R.menu.menu_map,
+        menu = menu,
+        icons = *arrayOf(
+            R.id.menu_map_style to ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_layers_black_24dp
+            )!!
+        )
+    )
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item ?: return false
+        mapboxMap.setStyleUrl(
+            when (item.itemId) {
+                R.id.menu_streets -> Style.MAPBOX_STREETS
+                R.id.menu_dark -> Style.DARK
+                R.id.menu_light -> Style.LIGHT
+                R.id.menu_outdoors -> Style.OUTDOORS
+                R.id.menu_satellite -> Style.SATELLITE
+                R.id.menu_satellite_streets -> Style.SATELLITE_STREETS
+                else -> return super.onOptionsItemSelected(item)
+            }
+        )
+        return true
     }
 
     override fun onRequestPermissionsResult(

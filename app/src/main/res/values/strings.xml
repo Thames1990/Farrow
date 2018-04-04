@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="action_1">Action 1</string>
-    <string name="action_2">Action 2</string>
-
     <string name="app_name">Farrow</string>
+
+    <string name="menu_map_style">Map Style</string>
+    <string name="menu_map_style_dark">Dark</string>
+    <string name="menu_map_style_light">Light</string>
+    <string name="menu_map_style_outdoors">Outdoors</string>
+    <string name="menu_map_style_satellite">Satellite</string>
+    <string name="menu_map_style_satellite_streets">Satellite Streets</string>
+    <string name="menu_map_style_streets">Mapbox Streets</string>
 
     <string name="subhead">Subhead</string>
 
