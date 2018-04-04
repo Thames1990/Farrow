@@ -3,7 +3,6 @@ package ds.mathematik.uni_marburg.de.farrow.fragments
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -21,6 +20,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.model.event.Event
 import ds.mathematik.uni_marburg.de.farrow.utils.createOptionsMenu
@@ -50,14 +50,15 @@ class MapFragment : BaseFragment() {
         mapView.getMapAsync {
             mapboxMap = it
 
-            mapboxMap.setStyleUrl(Style.DARK)
-
             enableLocationPlugin()
             enableClusterPlugin()
 
             observe(
                 liveData = eventViewModel.events,
-                onChanged = { events -> clusterManagerPlugin.addItems(events) }
+                onChanged = { events ->
+                    clusterManagerPlugin.clearItems()
+                    clusterManagerPlugin.addItems(events)
+                }
             )
 
             fab.setOnClickListener {
@@ -76,12 +77,7 @@ class MapFragment : BaseFragment() {
         inflater = inflater,
         menuRes = R.menu.menu_map,
         menu = menu,
-        icons = *arrayOf(
-            R.id.menu_map_style to ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_layers_black_24dp
-            )!!
-        )
+        iicons = *arrayOf(R.id.menu_map_style to GoogleMaterial.Icon.gmd_layers)
     )
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

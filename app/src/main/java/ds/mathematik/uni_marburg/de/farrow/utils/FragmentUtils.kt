@@ -3,12 +3,13 @@ package ds.mathematik.uni_marburg.de.farrow.utils
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
 import android.support.annotation.MenuRes
 import android.support.v4.app.Fragment
 import android.view.Menu
 import android.view.MenuInflater
+import ca.allanwang.kau.utils.setMenuIcons
+import com.mikepenz.iconics.typeface.IIcon
 
 /**
  * Initialize the contents of the Activity's standard options menu.
@@ -17,20 +18,21 @@ import android.view.MenuInflater
  * @param menuRes
  * @param menu
  * @param color
- * @param icons
+ * @param iicons
  */
-inline fun createOptionsMenu(
+inline fun Fragment.createOptionsMenu(
     inflater: MenuInflater?,
     @MenuRes menuRes: Int,
     menu: Menu?,
     @ColorInt color: Int = Color.WHITE,
-    vararg icons: Pair<Int, Drawable>,
+    vararg iicons: Pair<Int, IIcon>,
     block: () -> Unit = {}
 ) {
     inflater ?: return
     menu ?: return
     inflater.inflate(menuRes, menu)
-    setMenuIcons(menu, color, *icons)
+    val context = requireContext()
+    context.setMenuIcons(menu, color, *iicons)
     block()
 }
 

@@ -3,10 +3,11 @@ package ds.mathematik.uni_marburg.de.farrow.fragments
 import android.os.Bundle
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import ca.allanwang.kau.utils.inflate
+import ca.allanwang.kau.utils.withLinearAdapter
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
 import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
@@ -15,7 +16,6 @@ import com.squareup.picasso.Picasso
 import ds.mathematik.uni_marburg.de.farrow.BuildConfig
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.model.event.Event
-import ds.mathematik.uni_marburg.de.farrow.utils.inflate
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.event_row.*
@@ -30,11 +30,8 @@ class EventsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recyclerView.withLinearAdapter(eventAdapter)
         observe(eventViewModel.events, eventAdapter::submitList)
-        with(recyclerView) {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = eventAdapter
-        }
     }
 
     private class EventAdapter : ListAdapter<Event, EventAdapter.ViewHolder>(diffCallback) {
@@ -61,7 +58,7 @@ class EventsFragment : BaseFragment() {
                     title_text.text = event.id.toString()
                     subtitle_text.text = "$latitude\n$longitude"
 
-                    val cameraPoint = Point.fromLngLat(latitude, longitude)
+                    val cameraPoint = Point.fromLngLat(longitude, latitude)
 
                     val mapStaticImage = MapboxStaticMap
                         .builder()
