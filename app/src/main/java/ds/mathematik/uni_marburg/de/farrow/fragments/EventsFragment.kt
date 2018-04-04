@@ -67,45 +67,16 @@ class EventsFragment : BaseFragment() {
 
             fun bindTo(event: Event?) {
                 if (event != null) {
-                    val latitude: Double = event.latitude
-                    val longitude: Double = event.longitude
-
-                    setTitle(event)
-                    setSubTitle(latitude, longitude)
-                    setMap(longitude, latitude)
+                    setMediaImage(event)
+                    setSupportingText(event)
                 }
             }
 
-            private fun setTitle(event: Event) {
-                title_text.text = "${event.id}\n${event.latitude}\n${event.longitude}"
-            }
-
-            private fun setSubTitle(latitude: Double, longitude: Double) = doAsync {
-                val addresses: List<Address> = AndroidGeocoder(containerView.context).apply {
-                    setAccessToken(BuildConfig.MAPBOX_KEY)
-                }.getFromLocation(latitude, longitude, 1)
-                uiThread {
-                    if (addresses.isNotEmpty()) {
-                        subtitle_text.text = addresses
-                            .first()
-                            .getAddressLine(0)
-                            .replace(
-                                oldValue = "unnamed road, ",
-                                newValue = "",
-                                ignoreCase = true
-                            )
-                            .replace(oldValue = ", ", newValue = "\n")
-                    }
-                }
-            }
-
-            private fun setMap(longitude: Double, latitude: Double) {
-                val cameraPoint = Point.fromLngLat(longitude, latitude)
-
+            private fun setMediaImage(event: Event) {
+                val cameraPoint = Point.fromLngLat(event.longitude, event.latitude)
                 val mapStaticImage = MapboxStaticMap
                     .builder()
                     .accessToken(BuildConfig.MAPBOX_KEY)
-                    .styleId(StaticMapCriteria.OUTDOORS_STYLE)
                     .cameraPoint(cameraPoint)
                     .cameraZoom(12.0)
                     .staticMarkerAnnotations(
@@ -127,6 +98,26 @@ class EventsFragment : BaseFragment() {
                     .into(media_image)
             }
 
+            private fun setSupportingText(event: Event) = doAsync {
+                val addresses: List<Address> = AndroidGeocoder(containerView.context).apply {
+                    setAccessToken(BuildConfig.MAPBOX_KEY)
+                }.getFromLocation(event.latitude, event.longitude, 1)
+
+                uiThread {
+                    supporting_text.text =
+                            if (addresses.isNotEmpty()) addresses
+                                .first()
+                                .getAddressLine(0)
+                                .replace(
+                                    oldValue = "unnamed road, ",
+                                    newValue = "",
+                                    ignoreCase = true
+                                )
+                                .replace(oldValue = ", ", newValue = "\n")
+                            else "${event.latitude}\n${event.longitude}"
+                }
+            }
+
         }
 
         companion object {
@@ -140,7 +131,6 @@ class EventsFragment : BaseFragment() {
                     oldItem: Event?,
                     newItem: Event?
                 ): Boolean = oldItem == newItem
-
             }
         }
 
