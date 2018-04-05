@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import ca.allanwang.kau.utils.toDrawable
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import ds.mathematik.uni_marburg.de.farrow.R
+import ds.mathematik.uni_marburg.de.farrow.fragments.BaseFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.DashboardFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.EventsFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.MapFragment
@@ -26,32 +27,40 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
     }
 
-    private fun setupNavigation() = with(bottom_navigation) {
-        menu.itemsSequence().forEach { item ->
-            item.icon = when (item.itemId) {
-                R.id.action_dashboard -> GoogleMaterial.Icon.gmd_dashboard.toDrawable(context)
-                R.id.action_events -> GoogleMaterial.Icon.gmd_view_list.toDrawable(context)
-                R.id.action_map -> GoogleMaterial.Icon.gmd_map.toDrawable(context)
-                else -> TODO()
-            }
+    private fun setupNavigation() {
+        with(viewpager) {
+            adapter = BottomNavigationAdapter(
+                DashboardFragment(),
+                EventsFragment(),
+                MapFragment()
+            )
+            offscreenPageLimit = 2
         }
 
-        viewpager.adapter = BottomNavigationAdapter()
-
-        setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.action_dashboard -> viewpager.currentItem = 0
-                R.id.action_events -> viewpager.currentItem = 1
-                R.id.action_map -> viewpager.currentItem = 2
+        with(bottom_navigation) {
+            menu.itemsSequence().forEach { item ->
+                item.icon = when (item.itemId) {
+                    R.id.action_dashboard -> GoogleMaterial.Icon.gmd_dashboard.toDrawable(context)
+                    R.id.action_events -> GoogleMaterial.Icon.gmd_view_list.toDrawable(context)
+                    R.id.action_map -> GoogleMaterial.Icon.gmd_map.toDrawable(context)
+                    else -> TODO()
+                }
             }
-            true
+
+            setOnNavigationItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.action_dashboard -> viewpager.currentItem = 0
+                    R.id.action_events -> viewpager.currentItem = 1
+                    R.id.action_map -> viewpager.currentItem = 2
+                }
+                true
+            }
         }
     }
 
-    private inner class BottomNavigationAdapter : FragmentPagerAdapter(supportFragmentManager) {
-
-        private val fragments: List<Fragment> =
-            listOf(DashboardFragment(), EventsFragment(), MapFragment())
+    private inner class BottomNavigationAdapter(
+        vararg val fragments: BaseFragment
+    ) : FragmentPagerAdapter(supportFragmentManager) {
 
         override fun getItem(position: Int): Fragment = fragments[position]
 
