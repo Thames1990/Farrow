@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import ca.allanwang.kau.utils.inflate
 import ca.allanwang.kau.utils.withLinearAdapter
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
-import com.mapbox.api.staticmap.v1.StaticMapCriteria
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
 import com.mapbox.geocoder.android.AndroidGeocoder
 import com.mapbox.geojson.Point
