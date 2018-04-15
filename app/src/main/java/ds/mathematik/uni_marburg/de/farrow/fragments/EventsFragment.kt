@@ -1,12 +1,15 @@
 package ds.mathematik.uni_marburg.de.farrow.fragments
 
+import android.content.Context
 import android.location.Address
 import android.os.Bundle
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import ca.allanwang.kau.utils.inflate
 import ca.allanwang.kau.utils.withLinearAdapter
 import com.mapbox.api.staticmap.v1.MapboxStaticMap
@@ -64,6 +67,16 @@ class EventsFragment : BaseFragment() {
             override val containerView: View
         ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
+            private val windowManager: WindowManager
+                get() = containerView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+            val displayMetrics: DisplayMetrics
+                get() {
+                    val metrics = DisplayMetrics()
+                    windowManager.defaultDisplay.getMetrics(metrics)
+                    return metrics
+                }
+
             fun bindTo(event: Event?) {
                 if (event != null) {
                     setMediaImage(event)
@@ -72,21 +85,20 @@ class EventsFragment : BaseFragment() {
             }
 
             private fun setMediaImage(event: Event) {
+                val width: Int = displayMetrics.widthPixels
+                val height: Int = (width / 1.78).toInt()
                 val cameraPoint = Point.fromLngLat(event.longitude, event.latitude)
+                val marker: StaticMarkerAnnotation = StaticMarkerAnnotation.builder()
+                    .lnglat(cameraPoint)
+                    .build()
                 val mapStaticImage = MapboxStaticMap
                     .builder()
                     .accessToken(BuildConfig.MAPBOX_KEY)
                     .cameraPoint(cameraPoint)
-                    .cameraZoom(12.0)
-                    .staticMarkerAnnotations(
-                        listOf(
-                            StaticMarkerAnnotation.builder()
-                                .lnglat(cameraPoint)
-                                .build()
-                        )
-                    )
-                    .width(320)
-                    .height(180)
+                    .cameraZoom(16.0)
+                    .staticMarkerAnnotations(listOf(marker))
+                    .width(width)
+                    .height(height)
                     .retina(true)
                     .build()
 
