@@ -92,8 +92,6 @@ class EventsFragment : BaseFragment() {
 
                 Picasso.get()
                     .load(mapStaticImage.url().toString())
-                    .placeholder(R.color.cardview_dark_background)
-                    .error(android.R.color.holo_red_dark)
                     .into(media_image)
             }
 
