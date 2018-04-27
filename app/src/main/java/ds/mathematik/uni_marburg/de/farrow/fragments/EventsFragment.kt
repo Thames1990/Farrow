@@ -1,38 +1,28 @@
 package ds.mathematik.uni_marburg.de.farrow.fragments
 
-import android.content.Context
-import android.location.Address
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
-import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
+import ca.allanwang.kau.utils.bindViewResettable
 import ca.allanwang.kau.utils.inflate
 import ca.allanwang.kau.utils.withLinearAdapter
-import com.mapbox.api.staticmap.v1.MapboxStaticMap
-import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation
-import com.mapbox.geocoder.android.AndroidGeocoder
-import com.mapbox.geojson.Point
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
-import com.squareup.picasso.Picasso
-import ds.mathematik.uni_marburg.de.farrow.BuildConfig
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.model.event.Event
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
 import ds.mathematik.uni_marburg.de.farrow.utils.showWithOptions
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.event_row.*
-import kotlinx.android.synthetic.main.fragment_events.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 class EventsFragment : BaseFragment() {
 
     override val layout: Int
         get() = R.layout.fragment_events
+
+    private val fab by bindViewResettable<FloatingActionButton>(R.id.fab)
+    private val recyclerView by bindViewResettable<RecyclerView>(R.id.recycler_view)
 
     private val eventAdapter = EventAdapter()
 
@@ -63,19 +53,7 @@ class EventsFragment : BaseFragment() {
             position: Int
         ) = holder.bindTo(getItem(position))
 
-        class ViewHolder(
-            override val containerView: View
-        ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
-
-            private val windowManager: WindowManager
-                get() = containerView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-            val displayMetrics: DisplayMetrics
-                get() {
-                    val metrics = DisplayMetrics()
-                    windowManager.defaultDisplay.getMetrics(metrics)
-                    return metrics
-                }
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
             fun bindTo(event: Event?) {
                 if (event != null) {
@@ -84,48 +62,9 @@ class EventsFragment : BaseFragment() {
                 }
             }
 
-            private fun setMediaImage(event: Event) {
-                val width: Int = displayMetrics.widthPixels
-                val height: Int = (width / 1.78).toInt()
-                val cameraPoint = Point.fromLngLat(event.longitude, event.latitude)
-                val marker: StaticMarkerAnnotation = StaticMarkerAnnotation.builder()
-                    .lnglat(cameraPoint)
-                    .build()
-                val mapStaticImage = MapboxStaticMap
-                    .builder()
-                    .accessToken(BuildConfig.MAPBOX_KEY)
-                    .cameraPoint(cameraPoint)
-                    .cameraZoom(16.0)
-                    .staticMarkerAnnotations(listOf(marker))
-                    .width(width)
-                    .height(height)
-                    .retina(true)
-                    .build()
+            private fun setMediaImage(event: Event) = Unit
 
-                Picasso.get()
-                    .load(mapStaticImage.url().toString())
-                    .into(media_image)
-            }
-
-            private fun setSupportingText(event: Event) = doAsync {
-                val addresses: List<Address> = AndroidGeocoder(containerView.context).apply {
-                    setAccessToken(BuildConfig.MAPBOX_KEY)
-                }.getFromLocation(event.latitude, event.longitude, 1)
-
-                uiThread {
-                    supporting_text.text =
-                            if (addresses.isNotEmpty()) addresses
-                                .first()
-                                .getAddressLine(0)
-                                .replace(
-                                    oldValue = "unnamed road, ",
-                                    newValue = "",
-                                    ignoreCase = true
-                                )
-                                .replace(oldValue = ", ", newValue = "\n")
-                            else "${event.latitude}\n${event.longitude}"
-                }
-            }
+            private fun setSupportingText(event: Event) = Unit
 
         }
 

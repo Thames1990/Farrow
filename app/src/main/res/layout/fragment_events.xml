@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/event_row" />
@@ -20,7 +20,7 @@
         app:borderWidth="0dp"
         app:elevation="6dp"
         app:fabSize="normal"
-        app:layout_anchor="@+id/recyclerView"
+        app:layout_anchor="@+id/recycler_view"
         app:layout_anchorGravity="bottom|right|end"
         app:pressedTranslationZ="12dp" />
 

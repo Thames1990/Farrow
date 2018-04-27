@@ -3,10 +3,12 @@ package ds.mathematik.uni_marburg.de.farrow.fragments
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import ca.allanwang.kau.utils.bindViewResettable
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -17,6 +19,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
@@ -26,12 +29,14 @@ import ds.mathematik.uni_marburg.de.farrow.model.event.Event
 import ds.mathematik.uni_marburg.de.farrow.utils.createOptionsMenu
 import ds.mathematik.uni_marburg.de.farrow.utils.observe
 import ds.mathematik.uni_marburg.de.farrow.utils.showWithOptions
-import kotlinx.android.synthetic.main.fragment_map.*
 
 class MapFragment : BaseFragment() {
 
     override val layout: Int
         get() = R.layout.fragment_map
+
+    private val fab by bindViewResettable<FloatingActionButton>(R.id.fab)
+    private val mapView by bindViewResettable<MapView>(R.id.map_view)
 
     private lateinit var clusterManagerPlugin: ClusterManagerPlugin<Event>
     private lateinit var locationEngine: LocationEngine
@@ -66,10 +71,17 @@ class MapFragment : BaseFragment() {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun setupFab() = fab.showWithOptions(
         icon = GoogleMaterial.Icon.gmd_my_location,
         tooltipTextRes = R.string.fab_tooltip_my_location,
-        onClickListener = { locationPlugin.lastKnownLocation?.let { setCameraPosition(it) } }
+        onClickListener = {
+            if (PermissionsManager.areLocationPermissionsGranted(context)) {
+                locationEngine.lastLocation?.let { lastLocation ->
+                    setCameraPosition(lastLocation)
+                }
+            }
+        }
     )
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) = createOptionsMenu(
@@ -106,25 +118,27 @@ class MapFragment : BaseFragment() {
         if (PermissionsManager.areLocationPermissionsGranted(context)) {
             initializeLocationEngine()
 
-            locationPlugin = LocationLayerPlugin(mapView, mapboxMap, locationEngine)
-            locationPlugin.setLocationLayerEnabled(true)
+            locationPlugin = LocationLayerPlugin(mapView, mapboxMap, locationEngine).apply {
+                setLocationLayerEnabled(true)
+            }
         } else {
             permissionsManager = PermissionsManager(object : PermissionsListener {
                 override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) = Unit
                 override fun onPermissionResult(granted: Boolean) {
                     if (granted) enableLocationPlugin()
                 }
-            })
-            permissionsManager.requestLocationPermissions(requireActivity())
+            }).apply {
+                requestLocationPermissions(requireActivity())
+            }
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun initializeLocationEngine() {
-        locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
-        locationEngine.priority = LocationEnginePriority.HIGH_ACCURACY
-        locationEngine.activate()
-        locationEngine.lastLocation?.let { setCameraPosition(it) }
+        locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable().apply {
+            priority = LocationEnginePriority.HIGH_ACCURACY
+            activate()
+        }
     }
 
     private fun enableClusterPlugin() {

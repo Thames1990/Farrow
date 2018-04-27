@@ -1,9 +1,12 @@
 package ds.mathematik.uni_marburg.de.farrow.activities
 
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import ca.allanwang.kau.utils.bindView
 import ca.allanwang.kau.utils.toDrawable
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import ds.mathematik.uni_marburg.de.farrow.R
@@ -13,10 +16,12 @@ import ds.mathematik.uni_marburg.de.farrow.fragments.EventsFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.MapFragment
 import ds.mathematik.uni_marburg.de.farrow.model.event.EventViewModel
 import ds.mathematik.uni_marburg.de.farrow.utils.getViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.itemsSequence
 
 class MainActivity : AppCompatActivity() {
+
+    private val bottomNavigationView by bindView<BottomNavigationView>(R.id.bottom_navigation)
+    private val viewPager by bindView<ViewPager>(R.id.view_pager)
 
     private lateinit var eventViewModel: EventViewModel
 
@@ -28,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        with(viewpager) {
+        with(viewPager) {
             adapter = BottomNavigationAdapter(
                 DashboardFragment(),
                 EventsFragment(),
@@ -37,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             offscreenPageLimit = 2
         }
 
-        with(bottom_navigation) {
+        with(bottomNavigationView) {
             menu.itemsSequence().forEach { item ->
                 item.icon = when (item.itemId) {
                     R.id.action_dashboard -> GoogleMaterial.Icon.gmd_dashboard.toDrawable(context)
@@ -49,9 +54,9 @@ class MainActivity : AppCompatActivity() {
 
             setOnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
-                    R.id.action_dashboard -> viewpager.currentItem = 0
-                    R.id.action_events -> viewpager.currentItem = 1
-                    R.id.action_map -> viewpager.currentItem = 2
+                    R.id.action_dashboard -> viewPager.currentItem = 0
+                    R.id.action_events -> viewPager.currentItem = 1
+                    R.id.action_map -> viewPager.currentItem = 2
                 }
                 true
             }
