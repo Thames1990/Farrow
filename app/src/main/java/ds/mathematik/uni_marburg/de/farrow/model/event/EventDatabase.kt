@@ -51,7 +51,7 @@ abstract class EventDatabase : RoomDatabase() {
                 val dao: EventDao = eventDatabase.dao()
 
                 repeat(
-                    times = 10000,
+                    times = 1000,
                     action = {
                         val position: LatLng = generatePosition()
                         val event = Event(
