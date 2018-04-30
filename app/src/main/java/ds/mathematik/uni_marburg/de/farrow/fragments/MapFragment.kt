@@ -35,8 +35,8 @@ class MapFragment : BaseFragment() {
     override val layout: Int
         get() = R.layout.fragment_map
 
-    private val fab by bindViewResettable<FloatingActionButton>(R.id.fab)
-    private val mapView by bindViewResettable<MapView>(R.id.map_view)
+    private val fab: FloatingActionButton by bindViewResettable(R.id.fab)
+    private val mapView: MapView by bindViewResettable(R.id.map_view)
 
     private lateinit var clusterManagerPlugin: ClusterManagerPlugin<Event>
     private lateinit var locationEngine: LocationEngine

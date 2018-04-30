@@ -20,8 +20,8 @@ import org.jetbrains.anko.itemsSequence
 
 class MainActivity : AppCompatActivity() {
 
-    private val bottomNavigationView by bindView<BottomNavigationView>(R.id.bottom_navigation)
-    private val viewPager by bindView<ViewPager>(R.id.view_pager)
+    private val bottomNavigationView: BottomNavigationView by bindView(R.id.bottom_navigation)
+    private val viewPager: ViewPager by bindView(R.id.view_pager)
 
     private lateinit var eventViewModel: EventViewModel
 

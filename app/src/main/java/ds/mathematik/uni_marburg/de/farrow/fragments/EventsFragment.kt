@@ -21,8 +21,8 @@ class EventsFragment : BaseFragment() {
     override val layout: Int
         get() = R.layout.fragment_events
 
-    private val fab by bindViewResettable<FloatingActionButton>(R.id.fab)
-    private val recyclerView by bindViewResettable<RecyclerView>(R.id.recycler_view)
+    private val fab: FloatingActionButton by bindViewResettable(R.id.fab)
+    private val recyclerView: RecyclerView by bindViewResettable(R.id.recycler_view)
 
     private val eventAdapter = EventAdapter()
 
