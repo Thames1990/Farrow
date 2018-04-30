@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity">
 
-    <android.support.v4.view.ViewPager
+    <ds.mathematik.uni_marburg.de.farrow.NonSwipeableViewPager
         android:id="@+id/view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"

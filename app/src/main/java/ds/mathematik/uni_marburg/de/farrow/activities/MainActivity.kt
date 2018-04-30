@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import ca.allanwang.kau.utils.bindView
 import ca.allanwang.kau.utils.toDrawable
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import ds.mathematik.uni_marburg.de.farrow.NonSwipeableViewPager
 import ds.mathematik.uni_marburg.de.farrow.R
 import ds.mathematik.uni_marburg.de.farrow.fragments.BaseFragment
 import ds.mathematik.uni_marburg.de.farrow.fragments.DashboardFragment
@@ -21,7 +21,7 @@ import org.jetbrains.anko.itemsSequence
 class MainActivity : AppCompatActivity() {
 
     private val bottomNavigationView: BottomNavigationView by bindView(R.id.bottom_navigation)
-    private val viewPager: ViewPager by bindView(R.id.view_pager)
+    private val viewPager: NonSwipeableViewPager by bindView(R.id.view_pager)
 
     private lateinit var eventViewModel: EventViewModel
 
