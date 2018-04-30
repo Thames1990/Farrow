@@ -22,4 +22,6 @@
     <string name="title">Title</string>
 
     <string name="user_location_permission_not_granted">Location permission not granted</string>
+
+    <string name="zoom_to_all_markers">Zoom to all markers</string>
 </resources>

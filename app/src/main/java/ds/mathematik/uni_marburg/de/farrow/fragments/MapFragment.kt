@@ -88,22 +88,27 @@ class MapFragment : BaseFragment() {
         inflater = inflater,
         menuRes = R.menu.menu_map,
         menu = menu,
-        iicons = *arrayOf(R.id.menu_map_style to GoogleMaterial.Icon.gmd_layers)
+        iicons = *arrayOf(
+            R.id.menu_zoom_to_all_markers to GoogleMaterial.Icon.gmd_zoom_out_map,
+            R.id.menu_map_style to GoogleMaterial.Icon.gmd_layers
+        )
     )
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item ?: return false
-        mapboxMap.setStyleUrl(
-            when (item.itemId) {
-                R.id.menu_streets -> Style.MAPBOX_STREETS
-                R.id.menu_dark -> Style.DARK
-                R.id.menu_light -> Style.LIGHT
-                R.id.menu_outdoors -> Style.OUTDOORS
-                R.id.menu_satellite -> Style.SATELLITE
-                R.id.menu_satellite_streets -> Style.SATELLITE_STREETS
-                else -> return super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.menu_zoom_to_all_markers -> {
+                val events: MutableCollection<Event> = clusterManagerPlugin.algorithm.items
+                zoomToAllMarkers(events.toList())
             }
-        )
+            R.id.menu_streets -> mapboxMap.setStyleUrl(Style.MAPBOX_STREETS)
+            R.id.menu_dark -> mapboxMap.setStyleUrl(Style.DARK)
+            R.id.menu_light -> mapboxMap.setStyleUrl(Style.LIGHT)
+            R.id.menu_outdoors -> mapboxMap.setStyleUrl(Style.OUTDOORS)
+            R.id.menu_satellite -> mapboxMap.setStyleUrl(Style.SATELLITE)
+            R.id.menu_satellite_streets -> mapboxMap.setStyleUrl(Style.SATELLITE_STREETS)
+            else -> return super.onOptionsItemSelected(item)
+        }
         return true
     }
 
